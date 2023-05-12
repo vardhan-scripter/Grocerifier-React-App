@@ -6,7 +6,7 @@ export default function Header(props) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
-        <Link className="navbar-brand" to="/">Grocerify</Link>
+        <Link className="navbar-brand" to="/">Grocerifier</Link>
         <button
           className="navbar-toggler"
           type="button"
