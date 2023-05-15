@@ -23,7 +23,7 @@ export default function Login(props) {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container page-body">
       <div className="d-flex justify-content-center">
         <div className="col-md-3 vertical-center">
           <form onSubmit={handleLogin}>

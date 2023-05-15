@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import client from "../Axios";
 
 export default function Profile() {
   const [allValues, setAllValues] = useState({
@@ -31,54 +32,57 @@ export default function Profile() {
     }
   }, []);
 
-  const fetchUserDetails = (token) => {
-    fetch("http://localhost:5000/api/user", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token,
-      },
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        setAllValues({
-          email: response.email ?? "",
-          username: response.username ?? "",
-          name: response.name ?? "",
-          gender: response.gender ?? "",
-          address1: response.address1 ?? "",
-          address2: response.address2 ?? "",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
+  const fetchUserDetails = async (token) => {
+    try {
+      const response = await client.get("api/user", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
       });
+
+      if (response.status === 200) {
+        setAllValues({
+          email: response.data.email ?? "",
+          username: response.data.username ?? "",
+          name: response.data.name ?? "",
+          gender: response.data.gender ?? "",
+          address1: response.data.address1 ?? "",
+          address2: response.data.address2 ?? "",
+        });
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const saveUserDetails = (token) => {
-    fetch("http://localhost:5000/api/user/update", {
-      body: JSON.stringify(allValues),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token,
-      },
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((response) => {
+  const saveUserDetails = async (token) => {
+    try {
+      const response = await client.post("/api/user/update", allValues, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
+
+      if (response.status === 200) {
         setAllValues({
-          email: response.email ?? "",
-          username: response.username ?? "",
-          name: response.name ?? "",
-          gender: response.gender ?? "",
-          address1: response.address1 ?? "",
-          address2: response.address2 ?? "",
+          email: response.data.email ?? "",
+          username: response.data.username ?? "",
+          name: response.data.name ?? "",
+          gender: response.data.gender ?? "",
+          address1: response.data.address1 ?? "",
+          address2: response.data.address2 ?? "",
         });
         alert("User details updated successfully!!!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleSave = (e) => {
@@ -99,7 +103,7 @@ export default function Profile() {
 
   return (
     <form onSubmit={handleSave}>
-      <div className="container d-flex justify-content-center">
+      <div className="container d-flex justify-content-center page-body">
         <div className="col-md-4 vertical-center">
           <div className="text-center mb-4">
             <h1>User Profile</h1>

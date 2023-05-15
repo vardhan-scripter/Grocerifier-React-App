@@ -8,6 +8,10 @@ import Home from "./Components/Home";
 import Dashboard from "./Components/Dashboard";
 import Profile from "./Components/Profile";
 import Cart from "./Components/Cart";
+import 'font-awesome/css/font-awesome.min.css';
+import Orders from "./Components/Orders";
+import Order from "./Components/Order";
+import client from "./Axios";
 
 
 const App = () => {
@@ -34,71 +38,76 @@ const App = () => {
     }
   }, []);
 
-  const handleLogin = (email, password) => {
+  const handleLogin = async (email, password) => {
     if (email.length > 8 && password.length > 8) {
-      fetch("http://localhost:5000/api/auth/login", {
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.token !== null) {
-            setAllValues({
-              isUserAuthenticated: true,
-              token: response.token,
-              username: response.username
-            })
-            const authInfo = {
-              authToken: response.token,
-              expiresIn: Date.now() + (+response.expiresIn * 1000),
-              username: response.username
-            };
-            localStorage.setItem("authInfo", JSON.stringify(authInfo));
-            navigate('/dashboard', { replace: true });
-          } else {
-            console.log(response);
+      try {
+        const response = await client.post(
+          "/api/auth/login",
+          {
+            email: email,
+            password: password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }
+        );
 
-  const handleRegister = (email, username, password) => {
-    if (email.length > 8 && password.length > 8 && username.length > 8) {
-      fetch("http://localhost:5000/api/auth/register", {
-        body: JSON.stringify({
-          email: email,
-          username: username,
-          password: password,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.success === true) {
-            alert('User registered successfully');
-          } else {
-            console.log(response);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }else{
-      alert('Please enter all the details properly');
+        if (response.status === 200) {
+          setAllValues({
+            isUserAuthenticated: true,
+            token: response.data.token,
+            username: response.data.username,
+          });
+          const authInfo = {
+            authToken: response.data.token,
+            expiresIn: Date.now() + +response.data.expiresIn * 1000,
+            username: response.data.username,
+          };
+          localStorage.setItem("authInfo", JSON.stringify(authInfo));
+          navigate("/dashboard", { replace: true });
+        } else {
+          throw response.err;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      alert("Please enter all the details properly");
     }
-  }
+  };
+
+  const handleRegister = async (email, username, password) => {
+    if (email.length > 8 && password.length > 8 && username.length > 8) {
+      try {
+        const response = await client.post(
+          "/api/auth/register",
+          {
+            email: email,
+            username: username,
+            password: password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          alert("User registered successfully");
+          navigate("/login", { replace: true });
+        } else {
+          throw response.err;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      alert("Please enter all the details properly");
+    }
+  };
 
   const handleLogout = () => {
     setAllValues({
@@ -121,6 +130,8 @@ const App = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="cart" element={<Cart />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="orders/:orderId" element={<Order />} />
           <Route path="*" element={<Home />} />
         </Route>
       </Routes>

@@ -20,3 +20,46 @@ body {
 .submit-button {
   width: 100%;
 }
+
+.space {
+  margin: 10px;
+}
+
+.logout {
+  cursor: pointer;
+}
+
+.custom-search-bar {
+  height: 60px;
+  border-radius: 48px;
+}
+
+.cart-options {
+  margin: 0;
+  display: flex;
+}
+
+.cart-options p {
+  margin: auto 5px;
+}
+
+.cart-options button {
+  height: 24px;
+  width: 24px;
+  text-align: center;
+  font-size: 10px;
+  padding: 5px;
+}
+
+.button-right {
+  float: right;
+}
+
+.page-body {
+  margin-top: 110px;
+  margin-bottom: 110px;
+}
+
+.img-rounded {
+  border-radius: 30px;
+}

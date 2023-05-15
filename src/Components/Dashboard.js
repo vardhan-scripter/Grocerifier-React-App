@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import client from '../Axios';
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
@@ -22,38 +23,46 @@ export default function Dashboard() {
     }
   }, []);
 
-  const getAllProducts = (token) => {
-    fetch("http://localhost:5000/api/grocery/all", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token,
-      },
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        setProducts(response.Items);
-        updateProductsWithCartDetails(response.Items, token);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const getAllProducts = async (token) => {
+    try {
+      const response = await client.get(
+        "/api/grocery/all",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+          }
+        }
+      );
+  
+      if (response.status === 200) {
+        setProducts(response.data.Items);
+        updateProductsWithCartDetails(response.data.Items, token);
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const updateProductsWithCartDetails = (productsList, token) => {
-    fetch("http://localhost:5000/api/grocery/cart", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token,
-      },
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        if (response.success){
-            const initialCart = [];
+  const updateProductsWithCartDetails = async (productsList, token) => {
+    try {
+      const response = await client.get(
+        "/api/grocery/cart",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+          }
+        }
+      );
+  
+      if (response.status === 200) {
+        if(response.data.success){
+          const initialCart = [];
             productsList.forEach(product => {
-                const productExists = response.cart.items.filter(x => x.productId === product._id);
+                const productExists = response.data.cart.items.filter(x => x.productId === product._id);
                 if(productExists.length > 0){
                     initialCart.push({
                         productId: product._id,
@@ -67,10 +76,9 @@ export default function Dashboard() {
                 }
             });
             setCart(initialCart);
-            console.log(initialCart);
         }else{
-            const initialCart = [];
-            products.forEach(product => {
+          const initialCart = [];
+            productsList.forEach(product => {
                 initialCart.push({
                     productId: product._id,
                     count: 0
@@ -78,13 +86,15 @@ export default function Dashboard() {
             });
             setCart(initialCart);
         }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  const AddorRemoveFromCart = (cartItem, operation) => {
+  const AddorRemoveFromCart = async (cartItem, operation) => {
     const url =
       operation === "Add"
         ? "http://localhost:5000/api/grocery/cart/add"
@@ -95,29 +105,34 @@ export default function Dashboard() {
       return;
     }
 
-    fetch(url, {
-        body: JSON.stringify(cartItem),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": completeAuth.authToken,
-        },
-        method: "POST",
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          getAllProducts(completeAuth.authToken);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    try {
+      const response = await client.post(
+        url,
+        cartItem,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": completeAuth.authToken,
+          }
+        }
+      );
+  
+      if (response.status === 200) {
+        getAllProducts(completeAuth.authToken);
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const addToCartTemplate = (cartDetails) => {
     if (cartDetails && cartDetails.count > 0) {
       return (
-        <div className="col-md-4">
+        <div className="col-md-3">
           <div className="row cart-options">
-            <div className="col-md-5">
+            <div className="col-md-5 pt-1">
               <button
                 type="button"
                 className="btn btn-outline-success"
@@ -134,7 +149,7 @@ export default function Dashboard() {
             <div className="col-md-2 p-2">
               <h6>{cartDetails.count}</h6>
             </div>
-            <div className="col-md-5">
+            <div className="col-md-5 pt-1">
               <button
                 type="button"
                 className="btn btn-outline-success"
@@ -153,7 +168,7 @@ export default function Dashboard() {
       );
     } else {
       return (
-        <div className="col-md-4">
+        <div className="col-md-3">
           <button
             type="button"
             className="btn btn-success"
@@ -169,7 +184,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container">
+    <div className="container page-body">
       <div className="col-md-8 offset-2 mt-5">
         <div className="row">
           <input
@@ -185,8 +200,8 @@ export default function Dashboard() {
                 <div className="row g-0">
                   <div className="col-md-4">
                     <img
-                      src="https://upload.wikimedia.org/wikipedia/en/2/27/Happy_Faces_Biscuit.jpg"
-                      className="img-fluid rounded-start p-3"
+                      src="https://upload.wikimedia.org/wikipedia/en/d/dd/Parle_G_Biscuits.jpg"
+                      className="img-fluid img-rounded p-3"
                       alt="Product"
                     />
                   </div>
@@ -195,8 +210,8 @@ export default function Dashboard() {
                       <h5 className="card-title">{product.name}</h5>
                       <p className="card-text">{product.description}</p>
                       <div className="row">
-                        <div className="col-md-8">
-                            <h5>Price: ${product.price}</h5>
+                        <div className="col-md-9">
+                            <h5>Price: ₹{product.price}</h5>
                           <h6>Available Count: {product.availableCount}</h6>
                           <p>Rating: {product.rating}</p>
                         </div>

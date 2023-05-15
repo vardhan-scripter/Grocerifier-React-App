@@ -14,7 +14,7 @@ export default function Home(){
       }, []);
 
     return (
-        <div className="container">
+        <div className="container page-body">
             <div className="col-md-8 offset-2 text-center mt-5">
                 <h1> Your now at Grocify Homepage</h1>
             </div>

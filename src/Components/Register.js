@@ -25,7 +25,7 @@ export default function Register(props) {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container page-body">
       <div className="d-flex justify-content-center">
         <div className="col-md-3 vertical-center">
           <form onSubmit={handleRegister}>
@@ -40,7 +40,7 @@ export default function Register(props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <label className="form-label" for="loginName">
+              <label className="form-label" htmlFor="loginName">
                 Email
               </label>
             </div>
@@ -53,7 +53,7 @@ export default function Register(props) {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <label className="form-label" for="username">
+              <label className="form-label" htmlFor="username">
                 User Name
               </label>
             </div>
@@ -66,7 +66,7 @@ export default function Register(props) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <label className="form-label" for="signUpPassword">
+              <label className="form-label" htmlFor="signUpPassword">
                 Password
               </label>
             </div>
@@ -79,7 +79,7 @@ export default function Register(props) {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              <label className="form-label" for="confirmPassword">
+              <label className="form-label" htmlFor="confirmPassword">
                 Confirm Password
               </label>
             </div>

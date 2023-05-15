@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import client from "../Axios";
 
-export default function Cart(){
+export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
+  const [CartTotal, setCartTotal] = useState(0);
   const navigate = useNavigate();
   useEffect(() => {
     const authInfo = localStorage.getItem("authInfo");
@@ -14,111 +16,220 @@ export default function Cart(){
         navigate("/login", { replace: true });
       } else {
         setCompleteAuth(authInfoJson);
-        getAllProducts(authInfoJson.authToken);
+        getCartDetails(authInfoJson.authToken);
       }
     } else {
       navigate("/login", { replace: true });
     }
   }, []);
 
-  const getAllProducts = (token) => {
-    fetch("http://localhost:5000/api/grocery/cart", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token,
-      },
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        if(response.success){
-          updateCartWithProductDetails(response.cart.items, token);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+  const getCartDetails = async (token) => {
+    try {
+      const response = await client.get("/api/grocery/cart", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
       });
+
+      if (response.status === 200) {
+        updateCartWithProductDetails(response.data.cart.items, token);
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const updateCartWithProductDetails = (cartItemsList, token) => {
-    fetch("http://localhost:5000/api/grocery/all", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token,
-      },
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        const products = response.Items;
-        const updatedCartItems = cartItemsList.map(item => {
-          const product = products.filter(x => x._id === item.productId);
-          if(product.length > 0){
+  const updateCartWithProductDetails = async (cartItemsList, token) => {
+    try {
+      const response = await client.get("/api/grocery/all", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
+
+      if (response.status === 200) {
+        const products = response.data.Items;
+        let total = 0;
+        const updatedCartItems = cartItemsList.map((item) => {
+          const product = products.filter((x) => x._id === item.productId);
+          if (product.length > 0) {
+            total += product[0].price * item.count;
             return {
               ...item,
               name: product[0].name,
               description: product[0].description,
               price: product[0].price,
-              amount: product[0].price * item.count
+              amount: product[0].price * item.count,
             };
           }
-        })
+        });
+        setCartTotal(total);
         setCartItems(updatedCartItems);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }    
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    return (
-      <div className="container pagecontent">
-        <div className="d-flex justify-content-center">
-          <div className="col-md-8">
-            <div className="mb-4 mt-4">
-              <h1>Cart Details</h1>
-            </div>
-            <table className="table table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Count</th>
-                  <th>Price</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((cartItem, index) => {
-                  return (
-                    <tr key={index}>
-                    <td>{cartItem.name}</td>
-                    <td>{cartItem.description}</td>
-                    <td>
-                      <div className="cart-options">
-                        <button
-                          type="button"
-                          className="btn btn-outline-success"
-                        >
-                          <i className="fa fa-minus"></i>
-                        </button>
-                        <p>{cartItem.count}</p>
-                        <button
-                          type="button"
-                          className="btn btn-outline-success"
-                        >
-                          <i className="fa fa-plus"></i>
-                        </button>
-                      </div>
-                    </td>
-                    <td>{cartItem.price}</td>
-                    <td>{cartItem.amount}</td>
-                  </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+  const AddorRemoveFromCart = async (cartItem, operation) => {
+    const url =
+      operation === "Add"
+        ? "http://localhost:5000/api/grocery/cart/add"
+        : "http://localhost:5000/api/grocery/cart/Remove";
+    if (new Date() >= new Date(completeAuth.expiresIn)) {
+      localStorage.removeItem("authInfo");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      const response = await client.post(url, cartItem, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: completeAuth.authToken,
+        },
+      });
+
+      if (response.status === 200) {
+        getCartDetails(completeAuth.authToken);
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const placeOrder = async () => {
+    if (new Date() >= new Date(completeAuth.expiresIn)) {
+      localStorage.removeItem("authInfo");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      const response = await client.post(
+        "/api/grocery/order",
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: completeAuth.authToken,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("Your order is successfull!!!");
+        setCartItems([]);
+        setCartTotal(0);
+      } else {
+        throw response.err;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <div className="container page-body">
+      <div className="d-flex justify-content-center">
+        <div className="col-md-8">
+          <div className="mb-4 mt-4">
+            <h1>Cart Details</h1>
           </div>
+          {cartItems.length > 0 ? (
+            <>
+              <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Count</th>
+                    <th>Price</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cartItems.map((cartItem, index) => {
+                    return (
+                      <tr key={index}>
+                        <td>{cartItem.name}</td>
+                        <td>{cartItem.description}</td>
+                        <td>
+                          <div className="cart-options">
+                            <button
+                              type="button"
+                              className="btn btn-outline-success"
+                              onClick={() =>
+                                AddorRemoveFromCart(
+                                  {
+                                    productId: cartItem.productId,
+                                    count: 1,
+                                  },
+                                  "Remove"
+                                )
+                              }
+                            >
+                              <i className="fa fa-minus"></i>
+                            </button>
+                            <p>{cartItem.count}</p>
+                            <button
+                              type="button"
+                              className="btn btn-outline-success"
+                              onClick={() =>
+                                AddorRemoveFromCart(
+                                  {
+                                    productId: cartItem.productId,
+                                    count: 1,
+                                  },
+                                  "Add"
+                                )
+                              }
+                            >
+                              <i className="fa fa-plus"></i>
+                            </button>
+                          </div>
+                        </td>
+                        <td>₹{cartItem.price}</td>
+                        <td>₹{cartItem.amount}</td>
+                      </tr>
+                    );
+                  })}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <h6>Order Total</h6>
+                    </td>
+                    <td>
+                      <h6>₹{CartTotal}</h6>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className="mb-4 mt-4">
+                <button
+                  type="button"
+                  className="btn btn-outline-success button-right"
+                  onClick={placeOrder}
+                >
+                  Proceed with Order
+                </button>
+              </div>
+            </>
+          ) : (
+            <h6>No Cart Items Found!!! Please select any</h6>
+          )}
         </div>
       </div>
-    );
+    </div>
+  );
 }

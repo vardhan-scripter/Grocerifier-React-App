@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function Header(props) {
   const { authourized } = props;
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div className="container">
         <Link className="navbar-brand" to="/">Grocerifier</Link>
         <button
@@ -50,7 +50,7 @@ function AuthRoutes(props) {
         </Link>
       </li>
       <li className="nav-item">
-        <Link className="nav-link" to="/">Orders</Link>
+        <Link className="nav-link" to="/orders">Orders</Link>
       </li>
       <li className="nav-item dropdown">
         <a
