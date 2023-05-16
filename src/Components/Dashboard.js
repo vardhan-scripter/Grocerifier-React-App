@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from '../Axios';
+import Alert from "./Alert";
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
+  const [notification, setNotification] = useState({
+    isRequired: false,
+    type: '',
+    message: ''
+  })
+
   const navigate = useNavigate();
   useEffect(() => {
     const authInfo = localStorage.getItem("authInfo");
@@ -41,8 +48,12 @@ export default function Dashboard() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -89,8 +100,12 @@ export default function Dashboard() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   }
 
@@ -122,8 +137,12 @@ export default function Dashboard() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -185,6 +204,9 @@ export default function Dashboard() {
 
   return (
     <div className="container page-body">
+      {notification.isRequired ? (
+        <Alert type={notification.type} message={notification.message}></Alert>
+      ) : null}
       <div className="col-md-8 offset-2 mt-5">
         <div className="row">
           <input
@@ -211,11 +233,11 @@ export default function Dashboard() {
                       <p className="card-text">{product.description}</p>
                       <div className="row">
                         <div className="col-md-9">
-                            <h5>Price: ₹{product.price}</h5>
+                          <h5>Price: ₹{product.price}</h5>
                           <h6>Available Count: {product.availableCount}</h6>
                           <p>Rating: {product.rating}</p>
                         </div>
-                        { addToCartTemplate(cart[index]) }
+                        {addToCartTemplate(cart[index])}
                       </div>
                     </div>
                   </div>

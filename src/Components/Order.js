@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import client from "../Axios";
+import Alert from "./Alert";
 
 export default function Order() {
   const [completeAuth, setCompleteAuth] = useState(null);
   const [orders, setOrders] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
+  const [notification, setNotification] = useState({
+    isRequired: false,
+    type: '',
+    message: ''
+  })
   const params = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -40,8 +46,12 @@ export default function Order() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -75,13 +85,20 @@ export default function Order() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
   return (
     <div className="container page-body">
+      {notification.isRequired ? (
+        <Alert type={notification.type} message={notification.message}></Alert>
+      ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">
           <div className="mb-4 mt-4">

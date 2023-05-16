@@ -1,12 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function Header(props) {
   const { authourized } = props;
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div className="container">
-        <Link className="navbar-brand" to="/">Grocerifier</Link>
+        <NavLink className="navbar-brand" to="/">Grocerifier</NavLink>
         <button
           className="navbar-toggler"
           type="button"
@@ -32,10 +32,10 @@ function UnAuthRoutes() {
   return (
     <React.Fragment>
       <li className="nav-item">
-        <Link className="nav-link active" aria-current="page" to="/login">Login</Link>
+        <NavLink className="nav-link" aria-current="page" to="/login">Login</NavLink>
       </li>
       <li className="nav-item">
-        <Link className="nav-link" to="/register">Signup</Link>
+        <NavLink className="nav-link" to="/register">Signup</NavLink>
       </li>
     </React.Fragment>
   );
@@ -45,12 +45,12 @@ function AuthRoutes(props) {
   return (
     <React.Fragment>
       <li className="nav-item">
-        <Link className="nav-link" to="/cart">
+        <NavLink className="nav-link" to="/cart">
           <i className="fa fa-shopping-cart"></i>
-        </Link>
+        </NavLink>
       </li>
       <li className="nav-item">
-        <Link className="nav-link" to="/orders">Orders</Link>
+        <NavLink className="nav-link" to="/orders">Orders</NavLink>
       </li>
       <li className="nav-item dropdown">
         <a
@@ -68,10 +68,10 @@ function AuthRoutes(props) {
           aria-labelledby="navbarDropdown"
         >
           <li>
-            <Link className="dropdown-item" to="/profile">Profile</Link>
+            <NavLink className="dropdown-item" to="/profile">Profile</NavLink>
           </li>
           <li>
-            <Link className="dropdown-item" to="/">Account Settings</Link>
+            <NavLink className="dropdown-item" to="/">Account Settings</NavLink>
           </li>
         </ul>
       </li>

@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "../Axios";
+import Alert from "./Alert";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
   const [CartTotal, setCartTotal] = useState(0);
+  const [notification, setNotification] = useState({
+    isRequired: false,
+    type: '',
+    message: ''
+  })
+
   const navigate = useNavigate();
   useEffect(() => {
     const authInfo = localStorage.getItem("authInfo");
@@ -28,17 +35,23 @@ export default function Cart() {
       const response = await client.get("/api/grocery/cart", {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token,
+          "Authorization": token,
         },
       });
 
       if (response.status === 200) {
-        updateCartWithProductDetails(response.data.cart.items, token);
+        if(response.data.success) {
+          updateCartWithProductDetails(response.data.cart.items, token);
+        }
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -47,7 +60,7 @@ export default function Cart() {
       const response = await client.get("/api/grocery/all", {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token,
+          "Authorization": token,
         },
       });
 
@@ -72,8 +85,12 @@ export default function Cart() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -92,7 +109,7 @@ export default function Cart() {
       const response = await client.post(url, cartItem, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: completeAuth.authToken,
+          "Authorization": completeAuth.authToken,
         },
       });
 
@@ -101,8 +118,12 @@ export default function Cart() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -120,25 +141,36 @@ export default function Cart() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: completeAuth.authToken,
+            "Authorization": completeAuth.authToken,
           },
         }
       );
 
       if (response.status === 200) {
-        alert("Your order is successfull!!!");
+        setNotification({
+          isRequired: true,
+          type: 'success',
+          message: 'Your order is successfull!!!'
+        })
         setCartItems([]);
         setCartTotal(0);
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
   return (
     <div className="container page-body">
+      {notification.isRequired ? (
+        <Alert type={notification.type} message={notification.message}></Alert>
+      ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">
           <div className="mb-4 mt-4">

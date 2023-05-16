@@ -63,3 +63,12 @@ body {
 .img-rounded {
   border-radius: 30px;
 }
+
+.alert-fixed {
+  position:fixed; 
+  top: 80px; 
+  left: 5%;
+  width: 90%;
+  z-index:9999; 
+  border-radius:10px
+}

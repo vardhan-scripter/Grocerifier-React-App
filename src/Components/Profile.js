@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import client from "../Axios";
+import Alert from "./Alert";
 
 export default function Profile() {
   const [allValues, setAllValues] = useState({
@@ -11,6 +12,11 @@ export default function Profile() {
     address1: "",
     address2: "",
   });
+  const [notification, setNotification] = useState({
+    isRequired: false,
+    type: '',
+    message: ''
+  })
 
   const changeHandler = (e) => {
     setAllValues({ ...allValues, [e.target.name]: e.target.value });
@@ -53,8 +59,12 @@ export default function Profile() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -76,12 +86,20 @@ export default function Profile() {
           address1: response.data.address1 ?? "",
           address2: response.data.address2 ?? "",
         });
-        alert("User details updated successfully!!!");
+        setNotification({
+          isRequired: true,
+          type: 'success',
+          message: 'User details updated successfully!!!'
+        })
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -103,6 +121,9 @@ export default function Profile() {
 
   return (
     <form onSubmit={handleSave}>
+      {notification.isRequired ? (
+        <Alert type={notification.type} message={notification.message}></Alert>
+      ) : null}
       <div className="container d-flex justify-content-center page-body">
         <div className="col-md-4 vertical-center">
           <div className="text-center mb-4">

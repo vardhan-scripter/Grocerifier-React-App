@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "../Axios";
+import Alert from "./Alert";
 
 export default function Orders() {
   const [completeAuth, setCompleteAuth] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [notification, setNotification] = useState({
+    isRequired: false,
+    type: '',
+    message: ''
+  })
   const navigate = useNavigate();
   useEffect(() => {
     const authInfo = localStorage.getItem("authInfo");
@@ -46,8 +52,12 @@ export default function Orders() {
       } else {
         throw response.err;
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      setNotification({
+        isRequired: true,
+        type: 'danger',
+        message: 'Something went wrong at server side, please try after sometime'
+      })
     }
   };
 
@@ -57,6 +67,9 @@ export default function Orders() {
 
   return (
     <div className="container page-body">
+      {notification.isRequired ? (
+        <Alert type={notification.type} message={notification.message}></Alert>
+      ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">
           <div className="mb-4 mt-4">

@@ -12,6 +12,7 @@ import 'font-awesome/css/font-awesome.min.css';
 import Orders from "./Components/Orders";
 import Order from "./Components/Order";
 import client from "./Axios";
+import Alert from "./Components/Alert";
 
 
 const App = () => {
@@ -20,6 +21,12 @@ const App = () => {
     token: null,
     username: null
   });
+  const [notification, setNotification] = useState({
+    isRequired: false,
+    type: '',
+    message: ''
+  })
+
   const navigate = useNavigate();
   useEffect(() => {
     const authInfo = localStorage.getItem("authInfo");
@@ -70,11 +77,19 @@ const App = () => {
         } else {
           throw response.err;
         }
-      } catch (err) {
-        console.log(err);
+      } catch {
+        setNotification({
+          isRequired: true,
+          type: 'danger',
+          message: 'Something went wrong at server side, please try after sometime'
+        })
       }
     } else {
-      alert("Please enter all the details properly");
+      setNotification({
+        isRequired: true,
+        type: 'warning',
+        message: 'Please enter all the details properly'
+      })
     }
   };
 
@@ -96,16 +111,28 @@ const App = () => {
         );
 
         if (response.status === 200) {
-          alert("User registered successfully");
+          setNotification({
+            isRequired: true,
+            type: 'success',
+            message: 'User registered successfully'
+          })
           navigate("/login", { replace: true });
         } else {
           throw response.err;
         }
-      } catch (err) {
-        console.log(err);
+      } catch {
+        setNotification({
+          isRequired: true,
+          type: 'danger',
+          message: 'Something went wrong at server side, please try after sometime'
+        })
       }
     } else {
-      alert("Please enter all the details properly");
+      setNotification({
+        isRequired: true,
+        type: 'warning',
+        message: 'Please enter all the details properly'
+      })
     }
   };
 
@@ -122,6 +149,9 @@ const App = () => {
   
   return (
     <div className="App">
+      {notification.isRequired ? (
+        <Alert type={notification.type} message={notification.message}></Alert>
+      ) : null}
       <Routes>
         <Route path="/" element={<Layout isUserAuthenticated={allValues.isUserAuthenticated} handleLogout={handleLogout} username={allValues.username} />}>            
           <Route index element={<Home />} />
