@@ -23,8 +23,8 @@ const App = () => {
   });
   const [notification, setNotification] = useState({
     isRequired: false,
-    type: '',
-    message: ''
+    type: null,
+    message: null
   })
 
   const navigate = useNavigate();
@@ -146,11 +146,19 @@ const App = () => {
     // Need to redirect to login page
     navigate('/login', { replace: true });
   }
+
+  const handleNotification = () => {
+    setNotification({
+      isRequired: false,
+      type: null,
+      message: null
+    })
+  }
   
   return (
     <div className="App">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
       ) : null}
       <Routes>
         <Route path="/" element={<Layout isUserAuthenticated={allValues.isUserAuthenticated} handleLogout={handleLogout} username={allValues.username} />}>            

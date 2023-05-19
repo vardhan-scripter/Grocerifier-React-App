@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Alert from "./Alert";
 
 export default function Login(props) {
   const { loginHandler } = props;

@@ -70,9 +70,6 @@ function AuthRoutes(props) {
           <li>
             <NavLink className="dropdown-item" to="/profile">Profile</NavLink>
           </li>
-          <li>
-            <NavLink className="dropdown-item" to="/">Account Settings</NavLink>
-          </li>
         </ul>
       </li>
       <li className="nav-item">

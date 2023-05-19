@@ -119,10 +119,18 @@ export default function Profile() {
     }
   };
 
+  const handleNotification = () => {
+    setNotification({
+      isRequired: false,
+      type: null,
+      message: null
+    })
+  }
+
   return (
     <form onSubmit={handleSave}>
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
       ) : null}
       <div className="container d-flex justify-content-center page-body">
         <div className="col-md-4 vertical-center">

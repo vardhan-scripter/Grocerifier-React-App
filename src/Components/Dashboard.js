@@ -6,6 +6,8 @@ import Alert from "./Alert";
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filteredCart, setFilteredCart] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
   const [notification, setNotification] = useState({
     isRequired: false,
@@ -44,6 +46,7 @@ export default function Dashboard() {
   
       if (response.status === 200) {
         setProducts(response.data.Items);
+        setFilteredProducts(response.data.Items);
         updateProductsWithCartDetails(response.data.Items, token);
       } else {
         throw response.err;
@@ -87,6 +90,7 @@ export default function Dashboard() {
                 }
             });
             setCart(initialCart);
+            setFilteredCart(initialCart);
         }else{
           const initialCart = [];
             productsList.forEach(product => {
@@ -96,6 +100,7 @@ export default function Dashboard() {
                 })
             });
             setCart(initialCart);
+            setFilteredCart(initialCart);
         }
       } else {
         throw response.err;
@@ -202,10 +207,40 @@ export default function Dashboard() {
     }
   }
 
+  const handleNotification = () => {
+    setNotification({
+      isRequired: false,
+      type: null,
+      message: null
+    })
+  }
+
+  const filterProducts = (e) => {
+    const filterValue = e.target.value;
+    if (filterValue.length > 0) {
+      const initialProducts = [];
+      const initialCart = [];
+      for (let i = 0; i < products.length; i++) {
+        if (
+          products[i].name.includes(filterValue) ||
+          products[i].description.includes(filterValue)
+        ) {
+          initialProducts.push(products[i]);
+          initialCart.push(cart[i]);
+        }
+      }
+      setFilteredProducts(initialProducts);
+      setFilteredCart(initialCart);
+    } else {
+      setFilteredProducts(products);
+      setFilteredCart(cart);
+    }
+  }
+
   return (
     <div className="container page-body">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
       ) : null}
       <div className="col-md-8 offset-2 mt-5">
         <div className="row">
@@ -213,10 +248,11 @@ export default function Dashboard() {
             type="text"
             className="form-control border border-dark custom-search-bar"
             placeholder="Type anything for search"
+            onChange={filterProducts}
           />
         </div>
         <div className="row p-4 mt-4">
-          {products.map((product, index) => {
+          {filteredProducts.map((product, index) => {
             return (
               <div className="card mb-3" key={index}>
                 <div className="row g-0">
@@ -237,7 +273,7 @@ export default function Dashboard() {
                           <h6>Available Count: {product.availableCount}</h6>
                           <p>Rating: {product.rating}</p>
                         </div>
-                        {addToCartTemplate(cart[index])}
+                        {addToCartTemplate(filteredCart[index])}
                       </div>
                     </div>
                   </div>

@@ -65,10 +65,18 @@ export default function Orders() {
     navigate(`/orders/${orderId}`, { replace: true });
   };
 
+  const handleNotification = () => {
+    setNotification({
+      isRequired: false,
+      type: null,
+      message: null
+    })
+  }
+
   return (
     <div className="container page-body">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
       ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">
