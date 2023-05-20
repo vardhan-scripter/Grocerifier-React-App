@@ -4,7 +4,6 @@ import client from "../Axios";
 import Alert from "./Alert";
 
 export default function Orders() {
-  const [completeAuth, setCompleteAuth] = useState(null);
   const [orders, setOrders] = useState([]);
   const [notification, setNotification] = useState({
     isRequired: false,
@@ -20,13 +19,12 @@ export default function Orders() {
         localStorage.removeItem("authInfo");
         navigate("/login", { replace: true });
       } else {
-        setCompleteAuth(authInfoJson);
         getAllOrders(authInfoJson.authToken);
       }
     } else {
       navigate("/login", { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   const getAllOrders = async (token) => {
     try {

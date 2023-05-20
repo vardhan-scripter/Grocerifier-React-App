@@ -13,6 +13,8 @@ import Orders from "./Components/Orders";
 import Order from "./Components/Order";
 import client from "./Axios";
 import Alert from "./Components/Alert";
+import ForgotPassword from "./Components/ForgotPassword";
+import UpdatePassword from "./Components/UpdatePassword";
 
 
 const App = () => {
@@ -170,6 +172,8 @@ const App = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="orders" element={<Orders />} />
           <Route path="orders/:orderId" element={<Order />} />
+          <Route path="forgotPassword" element={<ForgotPassword />} />
+          <Route path="updatePassword" element={<UpdatePassword />} />
           <Route path="*" element={<Home />} />
         </Route>
       </Routes>

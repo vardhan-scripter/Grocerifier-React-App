@@ -65,7 +65,7 @@ export default function Login(props) {
 
             <div className="row mb-3">
               <div className="col-md-12 text-align-right">
-                <a href="#!">Forgot password?</a>
+                <Link to='/forgotPassword'>Forgot password?</Link>
               </div>
             </div>
 

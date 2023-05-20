@@ -28,7 +28,7 @@ export default function Cart() {
     } else {
       navigate("/login", { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   const getCartDetails = async (token) => {
     try {
@@ -67,9 +67,13 @@ export default function Cart() {
       if (response.status === 200) {
         const products = response.data.Items;
         let total = 0;
-        const updatedCartItems = cartItemsList.map((item) => {
-          const product = products.filter((x) => x._id === item.productId);
-          if (product.length > 0) {
+        const updatedCartItems = cartItemsList
+          .filter(
+            (item) =>
+              products.filter((x) => x._id === item.productId).length > 0
+          )
+          .map((item) => {
+            const product = products.filter((x) => x._id === item.productId);
             total += product[0].price * item.count;
             return {
               ...item,
@@ -78,8 +82,7 @@ export default function Cart() {
               price: product[0].price,
               amount: product[0].price * item.count,
             };
-          }
-        });
+          });
         setCartTotal(total);
         setCartItems(updatedCartItems);
       } else {
@@ -150,10 +153,13 @@ export default function Cart() {
         setNotification({
           isRequired: true,
           type: 'success',
-          message: 'Your order is successfull!!!'
+          message: 'Your order is successfull!, Please wait we are redirecting to you order'
         })
         setCartItems([]);
         setCartTotal(0);
+        setTimeout(() => {
+          navigate(`/orders/${response.data.orderId}`, { replace: true });
+        }, 1000);
       } else {
         throw response.err;
       }

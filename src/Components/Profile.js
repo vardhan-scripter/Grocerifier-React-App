@@ -36,7 +36,7 @@ export default function Profile() {
     } else {
       navigate("/login", { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   const fetchUserDetails = async (token) => {
     try {

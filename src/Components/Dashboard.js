@@ -30,7 +30,7 @@ export default function Dashboard() {
     } else {
       navigate("/login", { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   const getAllProducts = async (token) => {
     try {
@@ -222,8 +222,8 @@ export default function Dashboard() {
       const initialCart = [];
       for (let i = 0; i < products.length; i++) {
         if (
-          products[i].name.includes(filterValue) ||
-          products[i].description.includes(filterValue)
+          products[i].name.toUpperCase().includes(filterValue.toUpperCase()) ||
+          products[i].description.toUpperCase().includes(filterValue.toUpperCase())
         ) {
           initialProducts.push(products[i]);
           initialCart.push(cart[i]);

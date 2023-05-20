@@ -1,5 +1,12 @@
+import { useEffect } from "react";
+
 export default function Alert(props) {
   const classList = `alert-fixed alert alert-${props.type} alert-dismissible fade show`;
+  useEffect(() => {
+    setTimeout(() => {
+      props.closeAlert();
+    }, 5000);
+  }, [])
   return (
     <div className={classList} role="alert">
       {props.message}

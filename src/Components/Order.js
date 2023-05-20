@@ -4,7 +4,6 @@ import client from "../Axios";
 import Alert from "./Alert";
 
 export default function Order() {
-  const [completeAuth, setCompleteAuth] = useState(null);
   const [orders, setOrders] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
   const [notification, setNotification] = useState({
@@ -22,20 +21,19 @@ export default function Order() {
         localStorage.removeItem("authInfo");
         navigate("/login", { replace: true });
       } else {
-        setCompleteAuth(authInfoJson);
         getOrderDetails(params.orderId, authInfoJson.authToken);
       }
     } else {
       navigate("/login", { replace: true });
     }
-  }, [params]);
+  }, [params, navigate]);
 
   const getOrderDetails = async (orderId, token) => {
     try {
       const response = await client.get(`/api/grocery/order/${orderId}`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token,
+          "Authorization": token,
         },
       });
 
@@ -60,16 +58,20 @@ export default function Order() {
       const response = await client.get("/api/grocery/all", {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token,
+          "Authorization": token,
         },
       });
 
       if (response.status === 200) {
         const products = response.data.Items;
         let total = 0;
-        const updatedOrderItems = orderItemsList.map((item) => {
-          const product = products.filter((x) => x._id === item.productId);
-          if (product.length > 0) {
+        const updatedOrderItems = orderItemsList
+          .filter(
+            (item) =>
+              products.filter((x) => x._id === item.productId).length > 0
+          )
+          .map((item) => {
+            const product = products.filter((x) => x._id === item.productId);
             total += product[0].price * item.count;
             return {
               ...item,
@@ -78,8 +80,7 @@ export default function Order() {
               price: product[0].price,
               amount: product[0].price * item.count,
             };
-          }
-        });
+          });
         setOrderTotal(total);
         setOrders(updatedOrderItems);
       } else {
