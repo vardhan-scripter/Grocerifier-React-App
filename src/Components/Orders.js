@@ -73,9 +73,9 @@ export default function Orders() {
 
   return (
     <div className="container page-body">
-      {notification.isRequired ? (
+      {notification.isRequired && (
         <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
-      ) : null}
+      )}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">
           <div className="mb-4 mt-4">

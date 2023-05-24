@@ -239,9 +239,9 @@ export default function Dashboard() {
 
   return (
     <div className="container page-body">
-      {notification.isRequired ? (
+      {notification.isRequired && (
         <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
-      ) : null}
+      )}
       <div className="col-md-8 offset-2 mt-5">
         <div className="row">
           <input

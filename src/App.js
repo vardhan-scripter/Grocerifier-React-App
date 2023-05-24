@@ -159,9 +159,9 @@ const App = () => {
   
   return (
     <div className="App">
-      {notification.isRequired ? (
+      {notification.isRequired && (
         <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
-      ) : null}
+      )}
       <Routes>
         <Route path="/" element={<Layout isUserAuthenticated={allValues.isUserAuthenticated} handleLogout={handleLogout} username={allValues.username} />}>            
           <Route index element={<Home />} />

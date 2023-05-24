@@ -81,9 +81,9 @@ export default function UpdatePassword(props) {
 
   return (
     <div className="container page-body">
-    {notification.isRequired ? (
+    {notification.isRequired && (
       <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
-    ) : null}
+    )}
       <div className="d-flex justify-content-center">
         <div className="col-md-3 vertical-center">
           <form onSubmit={handleUpdatePassword}>

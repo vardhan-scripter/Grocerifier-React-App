@@ -22,7 +22,7 @@ export default function Register(props) {
         navigate("/dashboard", { replace: true });
       }
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="container page-body">

@@ -20,7 +20,7 @@ export default function Login(props) {
         navigate("/dashboard", { replace: true });
       }
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="container page-body">
