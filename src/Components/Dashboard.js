@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from '../Axios';
 import Alert from "./Alert";
+import defaultNotification from "../DefaultNotification";
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
@@ -9,11 +10,7 @@ export default function Dashboard() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredCart, setFilteredCart] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: '',
-    message: ''
-  })
+  const [notification, setNotification] = useState(defaultNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -207,14 +204,6 @@ export default function Dashboard() {
     }
   }
 
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
-
   const filterProducts = (e) => {
     const filterValue = e.target.value;
     if (filterValue.length > 0) {
@@ -240,7 +229,7 @@ export default function Dashboard() {
   return (
     <div className="container page-body">
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
       )}
       <div className="col-md-8 offset-2 mt-5">
         <div className="row">

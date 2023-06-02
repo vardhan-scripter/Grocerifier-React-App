@@ -2,21 +2,18 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import client from "../Axios";
 import Alert from "./Alert";
+import defaultNotification from "../DefaultNotification";
 
 export default function Profile() {
   const [allValues, setAllValues] = useState({
-    email: "",
-    username: "",
-    name: "",
-    gender: "",
-    address1: "",
-    address2: "",
+    email: '',
+    username: '',
+    name: '',
+    gender: '',
+    address1: '',
+    address2: ''
   });
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: '',
-    message: ''
-  })
+  const [notification, setNotification] = useState(defaultNotification)
 
   const changeHandler = (e) => {
     setAllValues({ ...allValues, [e.target.name]: e.target.value });
@@ -119,18 +116,10 @@ export default function Profile() {
     }
   };
 
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
-
   return (
     <form onSubmit={handleSave}>
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
       )}
       <div className="container d-flex justify-content-center page-body">
         <div className="col-md-4 vertical-center">

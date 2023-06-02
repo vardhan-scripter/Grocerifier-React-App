@@ -25,9 +25,9 @@ export default function Header(props) {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             {authorized ? (
-              <AuthRoutes handleLogout={props.handleLogout} />
+              <AuthorizedRoutes handleLogout={props.handleLogout} />
             ) : (
-              <UnAuthRoutes />
+              <UnAuthorizedRoutes />
             )}
           </ul>
         </div>
@@ -36,30 +36,36 @@ export default function Header(props) {
   );
 }
 
-function UnAuthRoutes() {
+function UnAuthorizedRoutes() {
   return (
-    <React.Fragment>
+    <>
       <li className="nav-item">
-        <NavLink className="nav-link" aria-current="page" to="/login">Login</NavLink>
+        <NavLink className="nav-link" aria-current="page" to="/login">
+          Login
+        </NavLink>
       </li>
       <li className="nav-item">
-        <NavLink className="nav-link" to="/register">Signup</NavLink>
+        <NavLink className="nav-link" to="/register">
+          Signup
+        </NavLink>
       </li>
-    </React.Fragment>
+    </>
   );
 }
 
-function AuthRoutes(props) {
-  const { username } = useContext(UserDetailsContext);
+function AuthorizedRoutes(props) {
+  const { userName } = useContext(UserDetailsContext);
   return (
-    <React.Fragment>
+    <>
       <li className="nav-item">
         <NavLink className="nav-link" to="/cart">
           <i className="fa fa-shopping-cart"></i>
         </NavLink>
       </li>
       <li className="nav-item">
-        <NavLink className="nav-link" to="/orders">Orders</NavLink>
+        <NavLink className="nav-link" to="/orders">
+          Orders
+        </NavLink>
       </li>
       <li className="nav-item dropdown">
         <a
@@ -70,20 +76,24 @@ function AuthRoutes(props) {
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          { username }
+          {userName}
         </a>
         <ul
           className="dropdown-menu dropdown-menu-end"
           aria-labelledby="navbarDropdown"
         >
           <li>
-            <NavLink className="dropdown-item" to="/profile">Profile</NavLink>
+            <NavLink className="dropdown-item" to="/profile">
+              Profile
+            </NavLink>
           </li>
         </ul>
       </li>
       <li className="nav-item">
-        <p className="nav-link logout" onClick={props.handleLogout} >Logout</p>
+        <p className="nav-link logout" onClick={props.handleLogout}>
+          Logout
+        </p>
       </li>
-    </React.Fragment>
+    </>
   );
 }

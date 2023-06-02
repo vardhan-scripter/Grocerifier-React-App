@@ -11,7 +11,7 @@ export default function Home(){
             navigate("/dashboard", { replace: true });
           }
         }
-      }, []);
+      }, [navigate]);
 
     return (
         <div className="container page-body">

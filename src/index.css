@@ -69,6 +69,6 @@ body {
   top: 80px; 
   left: 5%;
   width: 90%;
-  z-index:9999; 
+  z-index: 1; 
   border-radius:10px
 }

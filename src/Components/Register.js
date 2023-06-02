@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function Register(props) {
   const { registerHandler } = props;
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleRegister = (e) => {
     e.preventDefault();

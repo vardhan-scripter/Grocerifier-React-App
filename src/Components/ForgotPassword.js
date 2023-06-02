@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import client from '../Axios';
 import Alert from "./Alert";
+import defaultNotification from "../DefaultNotification";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: '',
-    message: ''
-  })
+  const [notification, setNotification] = useState(defaultNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -27,7 +24,7 @@ export default function ForgotPassword() {
     if (email.length > 8) {
       try {
         const response = await client.post(
-          "/api/auth/forgotpassword",
+          '/api/auth/forgotpassword',
           {
             email: email
           },
@@ -51,12 +48,20 @@ export default function ForgotPassword() {
         } else {
           throw response.err;
         }
-      } catch {
-        setNotification({
-          isRequired: true,
-          type: 'danger',
-          message: 'Something went wrong at server side, please try after sometime'
-        })
+      } catch (err) {
+        if(err.response.status === 404){
+          setNotification({
+            isRequired: true,
+            type: 'danger',
+            message: 'Email not exists, please enter valid email address'
+          })
+        } else {
+          setNotification({
+            isRequired: true,
+            type: 'danger',
+            message: 'Something went wrong at server side, please try after sometime'
+          })
+        }
       }
     } else {
       setNotification({
@@ -67,18 +72,10 @@ export default function ForgotPassword() {
     }
   };
 
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
-
   return (
     <div className="container page-body">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
       ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-3 vertical-center">

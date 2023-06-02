@@ -2,16 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "../Axios";
 import Alert from "./Alert";
+import defaultNotification from "../DefaultNotification";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
   const [CartTotal, setCartTotal] = useState(0);
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: '',
-    message: ''
-  })
+  const [notification, setNotification] = useState(defaultNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -172,18 +169,10 @@ export default function Cart() {
     }
   };
 
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
-
   return (
     <div className="container page-body">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
       ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">

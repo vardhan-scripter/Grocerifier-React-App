@@ -2,15 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import client from "../Axios";
 import Alert from "./Alert";
+import defaultNotification from "../DefaultNotification";
 
 export default function Order() {
   const [orders, setOrders] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: '',
-    message: ''
-  })
+  const [notification, setNotification] = useState(defaultNotification)
   const params = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -95,18 +92,10 @@ export default function Order() {
     }
   };
 
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
-
   return (
     <div className="container page-body">
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
       )}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">

@@ -5,8 +5,8 @@ export default function Alert(props) {
   useEffect(() => {
     setTimeout(() => {
       props.closeAlert();
-    }, 5000);
-  }, [])
+    }, 3000);
+  }, [props])
   return (
     <div className={classList} role="alert">
       {props.message}

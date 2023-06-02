@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "../Axios";
 import Alert from "./Alert";
+import defaultNotification from "../DefaultNotification";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: '',
-    message: ''
-  })
+  const [notification, setNotification] = useState(defaultNotification)
   const navigate = useNavigate();
   useEffect(() => {
     const authInfo = localStorage.getItem("authInfo");
@@ -63,18 +60,10 @@ export default function Orders() {
     navigate(`/orders/${orderId}`, { replace: true });
   };
 
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
-
   return (
     <div className="container page-body">
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
       )}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">

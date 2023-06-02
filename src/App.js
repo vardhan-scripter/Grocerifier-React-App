@@ -16,19 +16,15 @@ import Alert from "./Components/Alert";
 import ForgotPassword from "./Components/ForgotPassword";
 import UpdatePassword from "./Components/UpdatePassword";
 import UserDetailsContext from "./UserDetailsContext";
-
+import defaultNotification from "./DefaultNotification";
 
 const App = () => {
   const [allValues, setAllValues] = useState({
-    isUserAuthenticated: false,
-    token: null,
-    username: null
+    authorized: false,
+    authToken: null,
+    userName: null
   });
-  const [notification, setNotification] = useState({
-    isRequired: false,
-    type: null,
-    message: null
-  })
+  const [notification, setNotification] = useState(defaultNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -37,9 +33,9 @@ const App = () => {
       const authInfoJson = JSON.parse(authInfo);
       if (new Date() < new Date(authInfoJson.expiresIn)) {
         setAllValues({
-          isUserAuthenticated: true,
-          token: authInfoJson.token,
-          username: authInfoJson.username
+          authorized: true,
+          authToken: authInfoJson.authToken,
+          userName: authInfoJson.userName
         })
       } else {
         localStorage.removeItem("authInfo");
@@ -66,26 +62,34 @@ const App = () => {
 
         if (response.status === 200) {
           setAllValues({
-            isUserAuthenticated: true,
-            token: response.data.token,
-            username: response.data.username,
+            authorized: true,
+            authToken: response.data.authToken,
+            userName: response.data.userName,
           });
           const authInfo = {
-            authToken: response.data.token,
+            authToken: response.data.authToken,
             expiresIn: Date.now() + +response.data.expiresIn * 1000,
-            username: response.data.username,
+            userName: response.data.userName,
           };
           localStorage.setItem("authInfo", JSON.stringify(authInfo));
           navigate("/dashboard", { replace: true });
         } else {
           throw response.err;
         }
-      } catch {
-        setNotification({
-          isRequired: true,
-          type: 'danger',
-          message: 'Something went wrong at server side, please try after sometime'
-        })
+      } catch(err) {
+        if(err.response.status === 401){
+          setNotification({
+            isRequired: true,
+            type: 'danger',
+            message: 'Credential mismatch!, Please enter valid credentials'
+          })
+        } else{
+          setNotification({
+            isRequired: true,
+            type: 'danger',
+            message: 'Something went wrong at server side, please try after sometime'
+          })
+        }
       }
     } else {
       setNotification({
@@ -96,14 +100,14 @@ const App = () => {
     }
   };
 
-  const handleRegister = async (email, username, password) => {
-    if (email.length > 8 && password.length > 8 && username.length > 8) {
+  const handleRegister = async (email, userName, password) => {
+    if (email.length > 8 && password.length > 8 && userName.length > 8) {
       try {
         const response = await client.post(
           "/api/auth/register",
           {
             email: email,
-            username: username,
+            userName: userName,
             password: password,
           },
           {
@@ -123,12 +127,20 @@ const App = () => {
         } else {
           throw response.err;
         }
-      } catch {
-        setNotification({
-          isRequired: true,
-          type: 'danger',
-          message: 'Something went wrong at server side, please try after sometime'
-        })
+      } catch (err) {
+        if(err.response.status === 400){
+          setNotification({
+            isRequired: true,
+            type: 'danger',
+            message: 'Email already registered, Please enter valid details'
+          })
+        } else {
+          setNotification({
+            isRequired: true,
+            type: 'danger',
+            message: 'Something went wrong at server side, please try after sometime'
+          })
+        }
       }
     } else {
       setNotification({
@@ -141,31 +153,23 @@ const App = () => {
 
   const handleLogout = () => {
     setAllValues({
-      isUserAuthenticated: false,
-      token: null,
-      username: null
+      authorized: false,
+      authToken: null,
+      userName: null
     })
     localStorage.removeItem("authInfo");
     // Need to redirect to login page
     navigate('/login', { replace: true });
   }
-
-  const handleNotification = () => {
-    setNotification({
-      isRequired: false,
-      type: null,
-      message: null
-    })
-  }
   
   return (
     <UserDetailsContext.Provider value={{   
-      authorized: allValues.isUserAuthenticated,
-      username: allValues.username
+      authorized: allValues.authorized,
+      userName: allValues.userName
     }}>
       <div className="App">
         {notification.isRequired && (
-          <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+          <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
         )}
         <Routes>
           <Route path="/" element={<Layout handleLogout={handleLogout} />}>            
