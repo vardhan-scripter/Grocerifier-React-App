@@ -15,6 +15,7 @@ import client from "./Axios";
 import Alert from "./Components/Alert";
 import ForgotPassword from "./Components/ForgotPassword";
 import UpdatePassword from "./Components/UpdatePassword";
+import UserDetailsContext from "./UserDetailsContext";
 
 
 const App = () => {
@@ -158,26 +159,31 @@ const App = () => {
   }
   
   return (
-    <div className="App">
-      {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
-      )}
-      <Routes>
-        <Route path="/" element={<Layout isUserAuthenticated={allValues.isUserAuthenticated} handleLogout={handleLogout} username={allValues.username} />}>            
-          <Route index element={<Home />} />
-          <Route path="login" element={<Login loginHandler={handleLogin} />} />
-          <Route path="register" element={<Register registerHandler={handleRegister} />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="cart" element={<Cart />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="orders/:orderId" element={<Order />} />
-          <Route path="forgotPassword" element={<ForgotPassword />} />
-          <Route path="updatePassword" element={<UpdatePassword />} />
-          <Route path="*" element={<Home />} />
-        </Route>
-      </Routes>
-  </div>
+    <UserDetailsContext.Provider value={{   
+      authorized: allValues.isUserAuthenticated,
+      username: allValues.username
+    }}>
+      <div className="App">
+        {notification.isRequired && (
+          <Alert type={notification.type} message={notification.message} closeAlert={handleNotification}></Alert>
+        )}
+        <Routes>
+          <Route path="/" element={<Layout handleLogout={handleLogout} />}>            
+            <Route index element={<Home />} />
+            <Route path="login" element={<Login loginHandler={handleLogin} />} />
+            <Route path="register" element={<Register registerHandler={handleRegister} />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="orders/:orderId" element={<Order />} />
+            <Route path="forgotPassword" element={<ForgotPassword />} />
+            <Route path="updatePassword" element={<UpdatePassword />} />
+            <Route path="*" element={<Home />} />
+          </Route>
+        </Routes>
+      </div>
+    </UserDetailsContext.Provider>
   );
 }
 export default App;

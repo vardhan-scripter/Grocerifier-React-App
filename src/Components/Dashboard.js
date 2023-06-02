@@ -254,7 +254,7 @@ export default function Dashboard() {
         <div className="row p-4 mt-4">
           {filteredProducts.map((product, index) => {
             return (
-              <div className="card mb-3" key={index}>
+              <div className="card mb-3" key={product._id}>
                 <div className="row g-0">
                   <div className="col-md-4">
                     <img

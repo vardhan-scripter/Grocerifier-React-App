@@ -1,12 +1,16 @@
 import React from "react";
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import UserDetailsContext from "../UserDetailsContext";
 
 export default function Header(props) {
-  const { authourized } = props;
+  const { authorized } = useContext(UserDetailsContext);
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div className="container">
-        <NavLink className="navbar-brand" to="/">Grocerifier</NavLink>
+        <NavLink className="navbar-brand" to="/">
+          Grocerifier
+        </NavLink>
         <button
           className="navbar-toggler"
           type="button"
@@ -20,7 +24,11 @@ export default function Header(props) {
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-            {authourized ? <AuthRoutes handleLogout={props.handleLogout} username={props.username}/> : <UnAuthRoutes />}
+            {authorized ? (
+              <AuthRoutes handleLogout={props.handleLogout} />
+            ) : (
+              <UnAuthRoutes />
+            )}
           </ul>
         </div>
       </div>
@@ -42,6 +50,7 @@ function UnAuthRoutes() {
 }
 
 function AuthRoutes(props) {
+  const { username } = useContext(UserDetailsContext);
   return (
     <React.Fragment>
       <li className="nav-item">
@@ -61,7 +70,7 @@ function AuthRoutes(props) {
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          { props.username }
+          { username }
         </a>
         <ul
           className="dropdown-menu dropdown-menu-end"
