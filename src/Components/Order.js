@@ -1,25 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import client from "../Axios";
+import client from "../Utils/Axios";
 import Alert from "./Alert";
-import defaultNotification from "../DefaultNotification";
+import defaultNotification from "../Utils/DefaultNotification";
+import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
 
 export default function Order() {
   const [orders, setOrders] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
   const [notification, setNotification] = useState(defaultNotification)
   const params = useParams();
+  
   const navigate = useNavigate();
   useEffect(() => {
-    const authInfo = localStorage.getItem("authInfo");
-    if (authInfo !== null) {
-      const authInfoJson = JSON.parse(authInfo);
-      if (new Date() >= new Date(authInfoJson.expiresIn)) {
-        localStorage.removeItem("authInfo");
-        navigate("/login", { replace: true });
-      } else {
-        getOrderDetails(params.orderId, authInfoJson.authToken);
-      }
+    const auth = getStoredUserAuth();
+    if (auth !== null) {
+      getOrderDetails(params.orderId, auth.authToken);
     } else {
       navigate("/login", { replace: true });
     }

@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import UserDetailsContext from "../UserDetailsContext";
+import UserDetailsContext from "../Utils/UserDetailsContext";
 
 export default function Header(props) {
   const { authorized } = useContext(UserDetailsContext);

@@ -11,12 +11,13 @@ import Cart from "./Components/Cart";
 import 'font-awesome/css/font-awesome.min.css';
 import Orders from "./Components/Orders";
 import Order from "./Components/Order";
-import client from "./Axios";
+import client from "./Utils/Axios";
 import Alert from "./Components/Alert";
 import ForgotPassword from "./Components/ForgotPassword";
 import UpdatePassword from "./Components/UpdatePassword";
-import UserDetailsContext from "./UserDetailsContext";
-import defaultNotification from "./DefaultNotification";
+import UserDetailsContext from "./Utils/UserDetailsContext";
+import defaultNotification from "./Utils/DefaultNotification";
+import { getStoredUserAuth } from "./Utils/GetStoredUserAuth";
 
 const App = () => {
   const [allValues, setAllValues] = useState({
@@ -28,19 +29,15 @@ const App = () => {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const authInfo = localStorage.getItem("authInfo");
-    if (authInfo !== null) {
-      const authInfoJson = JSON.parse(authInfo);
-      if (new Date() < new Date(authInfoJson.expiresIn)) {
-        setAllValues({
-          authorized: true,
-          authToken: authInfoJson.authToken,
-          userName: authInfoJson.userName
-        })
-      } else {
-        localStorage.removeItem("authInfo");
-        navigate('/login', { replace: true });
-      }
+    const auth = getStoredUserAuth();
+    if (auth !== null) {
+      setAllValues({
+        authorized: true,
+        authToken: auth.authToken,
+        userName: auth.userName
+      })
+    }else{
+      navigate('/login', { replace: true });
     }
   }, []);
 
@@ -71,7 +68,7 @@ const App = () => {
             expiresIn: Date.now() + +response.data.expiresIn * 1000,
             userName: response.data.userName,
           };
-          localStorage.setItem("authInfo", JSON.stringify(authInfo));
+          localStorage.setItem("UserAuth", JSON.stringify(authInfo));
           navigate("/dashboard", { replace: true });
         } else {
           throw response.err;
@@ -157,7 +154,7 @@ const App = () => {
       authToken: null,
       userName: null
     })
-    localStorage.removeItem("authInfo");
+    localStorage.removeItem("UserAuth");
     // Need to redirect to login page
     navigate('/login', { replace: true });
   }

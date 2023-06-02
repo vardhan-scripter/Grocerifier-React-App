@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import client from '../Axios';
+import client from '../Utils/Axios';
 import Alert from "./Alert";
-import defaultNotification from "../DefaultNotification";
+import defaultNotification from "../Utils/DefaultNotification";
+import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
@@ -14,16 +15,10 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const authInfo = localStorage.getItem("authInfo");
-    if (authInfo !== null) {
-      const authInfoJson = JSON.parse(authInfo);
-      if (new Date() >= new Date(authInfoJson.expiresIn)) {
-        localStorage.removeItem("authInfo");
-        navigate("/login", { replace: true });
-      } else {
-        setCompleteAuth(authInfoJson);
-        getAllProducts(authInfoJson.authToken);
-      }
+    const auth = getStoredUserAuth();
+    if (auth !== null) {
+      setCompleteAuth(auth);
+      getAllProducts(auth.authToken);
     } else {
       navigate("/login", { replace: true });
     }
@@ -117,7 +112,7 @@ export default function Dashboard() {
         ? "http://localhost:5000/api/grocery/cart/add"
         : "http://localhost:5000/api/grocery/cart/Remove";
     if (new Date() >= new Date(completeAuth.expiresIn)) {
-      localStorage.removeItem("authInfo");
+      localStorage.removeItem("UserAuth");
       navigate("/login", { replace: true });
       return;
     }

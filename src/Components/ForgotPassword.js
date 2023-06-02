@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import client from '../Axios';
+import client from '../Utils/Axios';
 import Alert from "./Alert";
-import defaultNotification from "../DefaultNotification";
+import defaultNotification from "../Utils/DefaultNotification";
+import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -10,12 +11,9 @@ export default function ForgotPassword() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const authInfo = localStorage.getItem("authInfo");
-    if (authInfo !== null) {
-      const authInfoJson = JSON.parse(authInfo);
-      if (new Date() < new Date(authInfoJson.expiresIn)) {
-        navigate("/dashboard", { replace: true });
-      }
+    const auth = getStoredUserAuth();
+    if (auth !== null) {
+      navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
 

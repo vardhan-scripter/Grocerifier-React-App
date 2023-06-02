@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import client from "../Axios";
+import client from "../Utils/Axios";
 import Alert from "./Alert";
-import defaultNotification from "../DefaultNotification";
+import defaultNotification from "../Utils/DefaultNotification";
+import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -12,16 +13,10 @@ export default function Cart() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const authInfo = localStorage.getItem("authInfo");
-    if (authInfo !== null) {
-      const authInfoJson = JSON.parse(authInfo);
-      if (new Date() >= new Date(authInfoJson.expiresIn)) {
-        localStorage.removeItem("authInfo");
-        navigate("/login", { replace: true });
-      } else {
-        setCompleteAuth(authInfoJson);
-        getCartDetails(authInfoJson.authToken);
-      }
+    const auth = getStoredUserAuth();
+    if (auth !== null) {
+      setCompleteAuth(auth);
+      getCartDetails(auth.authToken);
     } else {
       navigate("/login", { replace: true });
     }
@@ -100,7 +95,7 @@ export default function Cart() {
         ? "http://localhost:5000/api/grocery/cart/add"
         : "http://localhost:5000/api/grocery/cart/Remove";
     if (new Date() >= new Date(completeAuth.expiresIn)) {
-      localStorage.removeItem("authInfo");
+      localStorage.removeItem("UserAuth");
       navigate("/login", { replace: true });
       return;
     }
@@ -129,7 +124,7 @@ export default function Cart() {
 
   const placeOrder = async () => {
     if (new Date() >= new Date(completeAuth.expiresIn)) {
-      localStorage.removeItem("authInfo");
+      localStorage.removeItem("UserAuth");
       navigate("/login", { replace: true });
       return;
     }
