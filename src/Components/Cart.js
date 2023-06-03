@@ -18,7 +18,7 @@ export default function Cart() {
       setCompleteAuth(auth);
       getCartDetails(auth.authToken);
     } else {
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 

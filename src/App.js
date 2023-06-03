@@ -168,9 +168,10 @@ const App = () => {
         {notification.isRequired && (
           <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
         )}
+        {console.log(allValues)}
         <Routes>
           <Route path="/" element={<Layout handleLogout={handleLogout} />}>            
-            <Route index element={<Home />} />
+            <Route index element={<Home handleLogout={handleLogout} />} />
             <Route path="login" element={<Login loginHandler={handleLogin} />} />
             <Route path="register" element={<Register registerHandler={handleRegister} />} />
             <Route path="dashboard" element={<Dashboard />} />

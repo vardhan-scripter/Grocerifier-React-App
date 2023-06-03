@@ -26,7 +26,7 @@ export default function Profile() {
     if (auth !== null) {
       fetchUserDetails(auth.authToken);
     } else {
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 

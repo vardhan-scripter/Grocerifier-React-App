@@ -14,7 +14,7 @@ export default function Orders() {
     if (auth !== null) {
       getAllOrders(auth.authToken);
     } else {
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
