@@ -168,7 +168,6 @@ const App = () => {
         {notification.isRequired && (
           <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
         )}
-        {console.log(allValues)}
         <Routes>
           <Route path="/" element={<Layout handleLogout={handleLogout} />}>            
             <Route index element={<Home handleLogout={handleLogout} />} />
