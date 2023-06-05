@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "./App.css";
 import Login from "./Components/Login";
 import Register from "./Components/Register";
@@ -16,8 +16,8 @@ import Alert from "./Components/Alert";
 import ForgotPassword from "./Components/ForgotPassword";
 import UpdatePassword from "./Components/UpdatePassword";
 import UserDetailsContext from "./Utils/UserDetailsContext";
-import defaultNotification from "./Utils/DefaultNotification";
 import { getStoredUserAuth } from "./Utils/GetStoredUserAuth";
+import { initialNotification, notificationReducer } from "./Utils/NotificationReducer";
 
 const App = () => {
   const [allValues, setAllValues] = useState({
@@ -25,7 +25,7 @@ const App = () => {
     authToken: null,
     userName: null
   });
-  const [notification, setNotification] = useState(defaultNotification)
+  const [notification, dispatchNotification] = useReducer(notificationReducer, initialNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -75,25 +75,22 @@ const App = () => {
         }
       } catch(err) {
         if(err.response.status === 401){
-          setNotification({
-            isRequired: true,
-            type: 'danger',
-            message: 'Credential mismatch!, Please enter valid credentials'
-          })
+          dispatchNotification({
+            type: "DANGER",
+            payload: "Credential mismatch!, Please enter valid credentials",
+          });
         } else{
-          setNotification({
-            isRequired: true,
-            type: 'danger',
-            message: 'Something went wrong at server side, please try after sometime'
-          })
+          dispatchNotification({
+            type: "DANGER",
+            payload: "Something went wrong at server side, please try after sometime",
+          });
         }
       }
     } else {
-      setNotification({
-        isRequired: true,
-        type: 'warning',
-        message: 'Please enter all the details properly'
-      })
+      dispatchNotification({
+        type: "WARNING",
+        payload: "Please enter all the details properly",
+      });
     }
   };
 
@@ -115,36 +112,32 @@ const App = () => {
         );
 
         if (response.status === 200) {
-          setNotification({
-            isRequired: true,
-            type: 'success',
-            message: 'User registered successfully'
-          })
+          dispatchNotification({
+            type: "success",
+            payload: "User registered successfully",
+          });
           navigate("/login", { replace: true });
         } else {
           throw response.err;
         }
       } catch (err) {
         if(err.response.status === 400){
-          setNotification({
-            isRequired: true,
-            type: 'danger',
-            message: 'Email already registered, Please enter valid details'
-          })
+          dispatchNotification({
+            type: "DANGER",
+            payload: "Email already registered, Please enter valid details",
+          });
         } else {
-          setNotification({
-            isRequired: true,
-            type: 'danger',
-            message: 'Something went wrong at server side, please try after sometime'
-          })
+          dispatchNotification({
+            type: "DANGER",
+            payload: "Something went wrong at server side, please try after sometime",
+          });
         }
       }
     } else {
-      setNotification({
-        isRequired: true,
-        type: 'warning',
-        message: 'Please enter all the details properly'
-      })
+      dispatchNotification({
+        type: "WARNING",
+        payload: "Please enter all the details properly",
+      });
     }
   };
 
@@ -166,7 +159,7 @@ const App = () => {
     }}>
       <div className="App">
         {notification.isRequired && (
-          <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
+          <Alert type={notification.type} message={notification.message} closeAlert={() => dispatchNotification({type: 'RESET'})}></Alert>
         )}
         <Routes>
           <Route path="/" element={<Layout handleLogout={handleLogout} />}>            

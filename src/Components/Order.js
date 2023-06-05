@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import client from "../Utils/Axios";
 import Alert from "./Alert";
-import defaultNotification from "../Utils/DefaultNotification";
 import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
+import { initialNotification, notificationReducer } from "../Utils/NotificationReducer";
 
 export default function Order() {
   const [orders, setOrders] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
-  const [notification, setNotification] = useState(defaultNotification)
+  const [notification, dispatchNotification] = useReducer(notificationReducer, initialNotification)
   const params = useParams();
   
   const navigate = useNavigate();
@@ -38,10 +38,9 @@ export default function Order() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -80,10 +79,9 @@ export default function Order() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -91,7 +89,7 @@ export default function Order() {
   return (
     <div className="container page-body">
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => dispatchNotification({type: 'RESET'})}></Alert>
       )}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">

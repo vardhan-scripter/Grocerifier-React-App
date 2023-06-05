@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import client from "../Utils/Axios";
 import Alert from "./Alert";
-import defaultNotification from "../Utils/DefaultNotification";
 import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
+import { initialNotification, notificationReducer } from "../Utils/NotificationReducer";
 
 export default function Profile() {
   const [allValues, setAllValues] = useState({
@@ -14,7 +14,7 @@ export default function Profile() {
     address1: '',
     address2: ''
   });
-  const [notification, setNotification] = useState(defaultNotification)
+  const [notification, dispatchNotification] = useReducer(notificationReducer, initialNotification)
 
   const changeHandler = (e) => {
     setAllValues({ ...allValues, [e.target.name]: e.target.value });
@@ -52,10 +52,9 @@ export default function Profile() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -78,19 +77,17 @@ export default function Profile() {
           address1: response.data.address1 ?? "",
           address2: response.data.address2 ?? "",
         });
-        setNotification({
-          isRequired: true,
-          type: 'success',
-          message: 'User details updated successfully!!!'
+        dispatchNotification({
+          type: 'SUCCESS',
+          payload: 'User details updated successfully!!!'
         })
       } else {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -114,7 +111,7 @@ export default function Profile() {
   return (
     <form onSubmit={handleSave}>
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => dispatchNotification({type: 'RESERT'})}></Alert>
       )}
       <div className="container d-flex justify-content-center page-body">
         <div className="col-md-4 vertical-center">

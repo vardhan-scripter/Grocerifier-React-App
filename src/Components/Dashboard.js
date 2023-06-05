@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from '../Utils/Axios';
 import Alert from "./Alert";
-import defaultNotification from "../Utils/DefaultNotification";
 import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
+import { initialNotification, notificationReducer } from "../Utils/NotificationReducer";
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
@@ -11,7 +11,7 @@ export default function Dashboard() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredCart, setFilteredCart] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
-  const [notification, setNotification] = useState(defaultNotification)
+  const [notification, dispatchNotification] = useReducer(notificationReducer, initialNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -44,10 +44,9 @@ export default function Dashboard() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -98,10 +97,9 @@ export default function Dashboard() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   }
@@ -135,10 +133,9 @@ export default function Dashboard() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
+      dispatchNotification({
         type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -224,7 +221,7 @@ export default function Dashboard() {
   return (
     <div className="container page-body">
       {notification.isRequired && (
-        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => dispatchNotification({type: 'RESET'})}></Alert>
       )}
       <div className="col-md-8 offset-2 mt-5">
         <div className="row">

@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "../Utils/Axios";
 import Alert from "./Alert";
-import defaultNotification from "../Utils/DefaultNotification";
 import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
+import { initialNotification, notificationReducer } from "../Utils/NotificationReducer";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [completeAuth, setCompleteAuth] = useState(null);
   const [CartTotal, setCartTotal] = useState(0);
-  const [notification, setNotification] = useState(defaultNotification)
+  const [notification, dispatchNotification] = useReducer(notificationReducer, initialNotification);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -39,10 +39,9 @@ export default function Cart() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -81,10 +80,9 @@ export default function Cart() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -114,10 +112,9 @@ export default function Cart() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -142,10 +139,9 @@ export default function Cart() {
       );
 
       if (response.status === 200) {
-        setNotification({
-          isRequired: true,
-          type: 'success',
-          message: 'Your order is successfull!, Please wait we are redirecting to you order'
+        dispatchNotification({
+          type: 'SUCCESS',
+          payload: 'Your order is successfull!, Please wait we are redirecting to you order'
         })
         setCartItems([]);
         setCartTotal(0);
@@ -156,10 +152,9 @@ export default function Cart() {
         throw response.err;
       }
     } catch {
-      setNotification({
-        isRequired: true,
-        type: 'danger',
-        message: 'Something went wrong at server side, please try after sometime'
+      dispatchNotification({
+        type: 'DANGER',
+        payload: 'Something went wrong at server side, please try after sometime'
       })
     }
   };
@@ -167,7 +162,7 @@ export default function Cart() {
   return (
     <div className="container page-body">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => dispatchNotification({type: 'RESET'})}></Alert>
       ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-8">

@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import client from '../Utils/Axios';
 import Alert from "./Alert";
-import defaultNotification from "../Utils/DefaultNotification";
 import { getStoredUserAuth } from "../Utils/GetStoredUserAuth";
+import { initialNotification, notificationReducer } from "../Utils/NotificationReducer";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [notification, setNotification] = useState(defaultNotification)
+  const [notification, dispatchNotification] = useReducer(notificationReducer, initialNotification)
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -34,10 +34,9 @@ export default function ForgotPassword() {
         );
 
         if (response.status === 200) {
-          setNotification({
-            isRequired: true,
-            type: 'success',
-            message: 'OTP sent to your email and mobile number, please check'
+          dispatchNotification({
+            type: 'SUCCESS',
+            payload: 'OTP sent to your email and mobile number, please check'
           })
           console.log(response.data);
           setTimeout(() => {
@@ -48,24 +47,21 @@ export default function ForgotPassword() {
         }
       } catch (err) {
         if(err.response.status === 404){
-          setNotification({
-            isRequired: true,
-            type: 'danger',
-            message: 'Email not exists, please enter valid email address'
+          dispatchNotification({
+            type: 'DANGER',
+            payload: 'Email not exists, please enter valid email address'
           })
         } else {
-          setNotification({
-            isRequired: true,
-            type: 'danger',
-            message: 'Something went wrong at server side, please try after sometime'
+          dispatchNotification({
+            type: 'DANGER',
+            payload: 'Something went wrong at server side, please try after sometime'
           })
         }
       }
     } else {
-      setNotification({
-        isRequired: true,
-        type: 'warning',
-        message: 'Please enter all the details properly'
+      dispatchNotification({
+        type: 'WARNING',
+        payload: 'Please enter all the details properly'
       })
     }
   };
@@ -73,7 +69,7 @@ export default function ForgotPassword() {
   return (
     <div className="container page-body">
       {notification.isRequired ? (
-        <Alert type={notification.type} message={notification.message} closeAlert={() => setNotification(defaultNotification)}></Alert>
+        <Alert type={notification.type} message={notification.message} closeAlert={() => dispatchNotification({type: 'RESET'})}></Alert>
       ) : null}
       <div className="d-flex justify-content-center">
         <div className="col-md-3 vertical-center">
